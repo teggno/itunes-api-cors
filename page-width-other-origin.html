@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Reproducing iTunes Store API CORS issue</title>
+    <script defer>
+      window.addEventListener("DOMContentLoaded", () => {
+        const requestButton = document.querySelector("#requestButton");
+
+        requestButton.addEventListener("click", () => {
+          performRequest();
+        });
+
+        function performRequest() {
+          const url =
+            "https://itunes.apple.com/search?media=podcast&term=hiking";
+          fetch(url)
+            .then((res) => {
+              if (res.status === 200) {
+                alert("success");
+              } else {
+                alert("no success. status: " + res.status);
+              }
+            })
+            .catch((e) => {
+              alert("error caught, " + e.toString());
+            });
+        }
+      });
+    </script>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+      }
+
+      input,
+      button {
+        font-size: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="requestButton">
+      Perform Request to iTunes Store API from different origin
+    </button>
+
+    <!-- <div id="consoleWrapper">
+      <div>
+        <h2>Console</h2>
+        <p>Console output:</p>
+      </div>
+      <button id="clearConsoleButton">Clear</button>
+      <div id="console"></div>
+    </div> -->
+  </body>
+</html>

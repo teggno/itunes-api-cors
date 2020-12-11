@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reproducing iTunes Store API CORS issue</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer>
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log("dcl");
+        const requestButton = document.querySelector("#requestButton");
+        const cnsl = document.querySelector("#console");
+        const clearConsoleButton = document.querySelector(
+          "#clearConsoleButton"
+        );
+
+        requestButton.addEventListener("click", () => {
+          performRequest();
+        });
+
+        clearConsoleButton.addEventListener("click", () => {
+          clearConsole();
+        });
+
+        function performRequest() {
+          const url =
+            "https://itunes.apple.com/search?media=podcast&term=hiking";
+          writeToConsole("starting request " + url);
+          fetch(url)
+            .then((res) => {
+              writeToConsole("success (observed in fetch().then() block)");
+              writeToConsole(`response status code ${res.status}`);
+            })
+            .catch((e) => {
+              writeToConsole("error (caught in fetch().catch() block)");
+              writeToConsole(e.toString());
+            });
+        }
+
+        function writeToConsole(text) {
+          const div = document.createElement("div");
+          div.innerHTML = text;
+          cnsl.appendChild(div);
+        }
+
+        function clearConsole() {
+          while (cnsl.children.length) {
+            cnsl.removeChild();
+          }
+        }
+      });
+    </script>
+    <link rel="icon" type="image/png" href="favicon.png" />
+  </head>
+  <body>
+    <h1>
+      This page aims to reproduce an issue with CORS requests to the iTunes
+      Store API.
+    </h1>
+    <p>
+      <a href="https://github.com/teggno/itunes-api-cors" target="_blank"
+        >Source sode of this site on GitHub</a
+      >
+    </p>
+    <h2>Issue Description</h2>
+    <p>
+      When performing consecutive CORS requests against the iTunes Store API at
+      <code>https://itunes.apple.com/search</code>
+      (<a
+        href="https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/"
+        target="_blank"
+        >docs go here</a
+      >) from different origins in browsers on the same machine, the browser
+      running the second request will receive a response with the origin of the
+      first request in the <code>access-control-allow-origin</code> header.
+    </p>
+
+    <h2>Steps to Reproduce</h2>
+    <ol>
+      <li>
+        Click the button below (it is in an <code>&lt;iframe&gt;</code> that
+        shows a page with a different origin than the one of the page you're
+        looking at.)
+        <iframe
+          src="page-width-other-origin.html"
+          width="100%"
+          height="30px"
+        ></iframe>
+        <!-- <iframe
+            src="https://itunes-api-cors.netlify.app/page-width-other-origin.html"
+            width="100%"
+            height="30px"
+          ></iframe> -->
+      </li>
+      <li>
+        Observe the <code>alert()</code> box saying "success" indicating the
+        request ran successfully.
+      </li>
+      <li>
+        Open the browser's dev tools and start recording the network traffic
+        (i.e. activate the network tab).
+      </li>
+      <li>
+        Click the button below<br />
+        <button id="requestButton">Perform Request to iTunes Store API</button>
+      </li>
+      <li>Observe the request failed in the console below.</li>
+      <li>
+        In the dev tools' network tab, observe that the response header
+        <code>access-control-allow-origin</code> has the value
+        <code>https://itunes-api-cors.netlify.app</code> which is the
+        <code>iframe</code>'s origin.
+      </li>
+    </ol>
+
+    <div id="consoleWrapper">
+      <div>
+        <h2>Console</h2>
+        <p>Console output:</p>
+      </div>
+      <button id="clearConsoleButton">Clear</button>
+      <div id="console"></div>
+    </div>
+  </body>
+</html>
