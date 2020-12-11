@@ -13,6 +13,12 @@
         const clearConsoleButton = document.querySelector(
           "#clearConsoleButton"
         );
+        const form = document.querySelector("form");
+        const urlInput = document.querySelector("#urlInput");
+        let url = "https://itunes.apple.com/search?media=podcast&term=hiking";
+        urlInput.value = url;
+        const iframe = document.querySelector("iframe");
+        iframe.src = makeIframeUrl();
 
         requestButton.addEventListener("click", () => {
           performRequest();
@@ -22,9 +28,13 @@
           clearConsole();
         });
 
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          url = urlInput.value;
+          iframe.src = makeIframeUrl();
+        });
+
         function performRequest() {
-          const url =
-            "https://itunes.apple.com/search?media=podcast&term=hiking";
           writeToConsole("starting request " + url);
           fetch(url)
             .then((res) => {
@@ -47,6 +57,13 @@
           while (cnsl.children.length) {
             cnsl.removeChild();
           }
+        }
+
+        function makeIframeUrl() {
+          const base =
+            "https://itunes-api-cors.netlify.app/page-width-other-origin.html";
+          // const base = "page-width-other-origin.html";
+          return `${base}?url=${encodeURIComponent(url)}`;
         }
       });
     </script>
@@ -78,14 +95,19 @@
     <h2>Steps to Reproduce</h2>
     <ol>
       <li>
+        <form>
+          <label for="urlInput"
+            >iTunes Store URL (change <code>term</code> query param to start
+            over)</label
+          >
+          <div><input type="url" id="urlInput" /></div>
+          <button>Apply URL</button>
+        </form>
+      </li>
+      <li>
         Click the button below (it is in an <code>&lt;iframe&gt;</code> that
         shows a page with a different origin than the one of the page you're
         looking at.)
-        <!-- <iframe
-          src="page-width-other-origin.html"
-          width="100%"
-          height="30px"
-        ></iframe> -->
         <iframe
           src="https://itunes-api-cors.netlify.app/page-width-other-origin.html"
           width="100%"

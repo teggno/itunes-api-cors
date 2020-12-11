@@ -90,3 +90,7 @@ iframe {
   border: 0;
   overflow: hidden;
 }
+
+#urlInput {
+  width: 500px;
+}

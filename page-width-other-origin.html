@@ -12,8 +12,9 @@
         });
 
         function performRequest() {
-          const url =
-            "https://itunes.apple.com/search?media=podcast&term=hiking";
+          const url = decodeURIComponent(
+            window.location.href.split("?")[1].substr(4)
+          );
           fetch(url)
             .then((res) => {
               if (res.status === 200) {
